@@ -1,5 +1,6 @@
 import re
 import json
+from func import seconds_to_length, length_to_seconds, seconds_to_hms
 
 # タイトルからタグを推定する簡易関数
 def extract_tags(title):
@@ -16,27 +17,6 @@ def extract_tags(title):
         if any(word in title for word in words):
             tags.append(tag)
     return tags
-
-def length_to_seconds(length_str):
-    # "00:08:56" → 536, "2 分 38 秒" → 158, "1 時間 2 分 3 秒" → 3723
-    if not length_str:
-        return 0
-    # 日本語表記対応
-    import re
-    jp = re.match(r"(?:(\d+)\s*時間)?\s*(?:(\d+)\s*分)?\s*(?:(\d+)\s*秒)?", length_str)
-    if jp and (jp.group(1) or jp.group(2) or jp.group(3)):
-        h = int(jp.group(1)) if jp.group(1) else 0
-        m = int(jp.group(2)) if jp.group(2) else 0
-        s = int(jp.group(3)) if jp.group(3) else 0
-        return h*3600 + m*60 + s
-    # 通常のコロン区切り
-    parts = [int(p) for p in length_str.split(":") if p.isdigit()]
-    if len(parts) == 3:
-        return parts[0]*3600 + parts[1]*60 + parts[2]
-    elif len(parts) == 2:
-        return parts[0]*60 + parts[1]
-    else:
-        return 0
 
 def detect_language(word):
     # ロシア語（キリル文字）

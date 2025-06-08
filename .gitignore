@@ -2,3 +2,4 @@ venv/
 User Data/
 time/
 *.json
+__pycache__/

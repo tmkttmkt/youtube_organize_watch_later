@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os
 import glob
+from func import seconds_to_length, length_to_seconds, seconds_to_hms
 
 
 
@@ -17,17 +18,6 @@ st.set_page_config(layout="wide")
 with open("tag_data.json", encoding="utf-8") as f:
     data = json.load(f)
 
-def parse_time_to_seconds(time_str):
-    # "2:01:50" → 7310, "1:13" → 73
-    parts = [int(p) for p in time_str.strip().split(":")]
-    if len(parts) == 3:
-        return parts[0]*3600 + parts[1]*60 + parts[2]
-    elif len(parts) == 2:
-        return parts[0]*60 + parts[1]
-    elif len(parts) == 1:
-        return int(parts[0])
-    else:
-        return 0
 
 def load_score_csvs():
     import glob
@@ -48,7 +38,7 @@ def load_score_csvs():
                 if len(cols) < 2:
                     continue
                 time_str = cols[1]
-                sec = parse_time_to_seconds(time_str)
+                sec =length_to_seconds(time_str)
                 total_data += int(cols[0])
                 total_sec += sec
                 total_score += sec * int(cols[0])
@@ -69,24 +59,6 @@ def load_score_csvs():
     ])
     df = df.sort_values("date")
     return df
-
-def length_to_seconds(length_str):
-    # "00:08:56" → 536
-    if not length_str:
-        return 0
-    parts = [int(p) for p in length_str.split(":")]
-    if len(parts) == 3:
-        return parts[0]*3600 + parts[1]*60 + parts[2]
-    elif len(parts) == 2:
-        return parts[0]*60 + parts[1]
-    else:
-        return 0
-
-def seconds_to_hms(sec):
-    h = sec // 3600
-    m = (sec % 3600) // 60
-    s = sec % 60
-    return f"{h:02}:{m:02}:{s:02}"
 
 df = pd.DataFrame(data)
 df["tag_str"] = df["tag"].apply(lambda tags: ", ".join(tags) if tags else "なし")
