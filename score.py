@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from func import seconds_to_length, length_to_seconds, seconds_to_hms
 
-with open("watch_later.json", encoding="utf-8") as f:
+with open("data/watch_later.json", encoding="utf-8") as f:
     data = json.load(f)
 
 today = datetime.now().strftime("%Y-%m-%d")
