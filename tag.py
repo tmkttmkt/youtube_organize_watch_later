@@ -5,6 +5,7 @@ from func import seconds_to_length, length_to_seconds, seconds_to_hms
 # タイトルからタグを推定する簡易関数
 def extract_tags(title):
     tags = []
+    return tags
     keywords = {
         "ゆっくり": ["ゆっくり"],
         "ゲーム":["実況","ゲーム"],
@@ -41,7 +42,7 @@ def get_time_group(length_str):
     else:
         return "ロング"
 
-with open("watch_later.json", encoding="utf-8") as f:
+with open("data/watch_later.json", encoding="utf-8") as f:
     data = json.load(f)
 
 for item in data:
@@ -57,5 +58,5 @@ for item in data:
     if has_en:
         item["tag"].append("英語")
 
-with open("tag_data.json", "w", encoding="utf-8") as f:
+with open("data/tag_data.json", "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)

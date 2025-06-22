@@ -9,6 +9,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
+
 # オプションの設定
 options = uc.ChromeOptions()
 # 必要に応じてプロファイルやその他のオプションを追加
@@ -61,56 +62,6 @@ while True:
         break
     last_height = new_height
 print("一番下までスクロールしました。")
-def parse_views(views_str):
-    # 例: "2.8万 回視聴" → 28000, "1234 回視聴" → 1234, "1.2億 回視聴" → 120000000
-    s = views_str.replace(',', '').split(' ')[0]
-    num = 0
-    if '億' in s:
-        num = float(s.replace('億', '')) * 100000000
-    elif '万' in s:
-        num = float(s.replace('万', '')) * 10000
-    else:
-        try:
-            num = float(s)
-        except ValueError:
-            num = 0
-    return int(num)
-# 「後で見る」の動画リストを取得
-videos = driver.find_elements(By.XPATH, "//ytd-playlist-video-renderer")
-video_data = []
-for video in videos:
-    try:
-        title_elem = video.find_element(By.CSS_SELECTOR, "#video-title")
-        channel_elem = video.find_element(By.CSS_SELECTOR, "a.yt-simple-endpoint.style-scope.yt-formatted-string")
-        length_elem = video.find_element(By.CSS_SELECTOR, "span.ytd-thumbnail-overlay-time-status-renderer")
-        print(":",length_elem.text)
-        metadata_spans = video.find_elements(By.CSS_SELECTOR, "span.style-scope.yt-formatted-string")
-        views = metadata_spans[0].text.strip() if len(metadata_spans) > 0 else ""
-        published = metadata_spans[2].text.strip() if len(metadata_spans) > 2 else ""
-        title = title_elem.text.strip() if title_elem else ""
-        channel = channel_elem.text.strip() if channel_elem else ""
-        length = length_elem.get_attribute("aria-label") if length_elem else ""
-        # もしaria-labelがなければテキストを使う
-        if not length:
-            length = length_elem.text.strip() if length_elem else ""
-        insert_date = time.strftime("%Y-%m-%d")
-        video_data.append({
-            "title": title,
-            "channel": channel,
-            "length": length,
-            "published": published,
-            "views": parse_views(views),
-            "insert": insert_date
-        })
-    except Exception as e:
-        print(f"動画情報の取得に失敗: {e}")
 
-# JSONファイルに書き込む
-with open("watch_later.json", "w", encoding="utf-8") as f:
-    json.dump(video_data, f, ensure_ascii=False, indent=2)
-
-print("動画情報をwatch_later.jsonに保存しました。")
-
-time.sleep(2)  # 2秒待機
-# ブラウザを閉じる
-driver.quit()
+driver.execute_script("window.scrollTo(0, 0);")
+print("一番上に戻りました。")
