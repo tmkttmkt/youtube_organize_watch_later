@@ -86,33 +86,15 @@ try:
     videos = driver.find_elements(By.XPATH, "//ytd-playlist-video-renderer")
     for video in videos:
         try:
-            # URL取得
-            url = ""
+            a_elem = video.find_element(By.CSS_SELECTOR, "a#video-title")
+            href = a_elem.get_attribute("href")
             video_id = ""
-            try:
-                url = title_elem.get_attribute("href")
-                if url and "/watch?v=" in url:
-                    # フルURLでなければYouTubeドメインを補完
-                    if url.startswith("/watch"):
-                        url = "https://www.youtube.com" + url
-                    # 動画ID抽出
-                    import urllib.parse
-                    parsed = urllib.parse.urlparse(url)
-                    qs = urllib.parse.parse_qs(parsed.query)
-                    video_id = qs.get("v", [""])[0]
-                else:
-                    # サムネイルリンクから取得
-                    thumb_a = video.find_element(By.CSS_SELECTOR, "a#thumbnail")
-                    url = thumb_a.get_attribute("href")
-                    if url and "/watch?v=" in url:
-                        if url.startswith("/watch"):
-                            url = "https://www.youtube.com" + url
-                        parsed = urllib.parse.urlparse(url)
-                        qs = urllib.parse.parse_qs(parsed.query)
-                        video_id = qs.get("v", [""])[0]
-            except Exception:
-                url = ""
-                video_id = ""
+            if href:
+                # href例: https://www.youtube.com/watch?v=KIT9n5vR-3Q&list=WL&index=3&pp=gAQBiAQB
+                import urllib.parse
+                parsed = urllib.parse.urlparse(href)
+                qs = urllib.parse.parse_qs(parsed.query)
+                video_id = qs.get("v", [""])[0]
             if video_id in id_list:
                 print(f"動画ID {video_id} は既に存在するためスキップします。")
                 continue
