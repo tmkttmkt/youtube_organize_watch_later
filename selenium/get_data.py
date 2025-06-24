@@ -12,8 +12,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 with open("data/watch_later.json", "r", encoding="utf-8") as f:
     video_data = json.load(f)
-id_list=[video["video_id"] for video in video_data]
-id_list.append("")
+id_dict = {video["video_id"]: video["insert"] for video in video_data}
+id_dict[""]=""
 # オプションの設定
 options = uc.ChromeOptions()
 #options.add_argument('--headless=new')  # ヘッドレスモードで起動（Chrome 109以降は--headless=new推奨）
@@ -95,7 +95,7 @@ try:
                 parsed = urllib.parse.urlparse(href)
                 qs = urllib.parse.parse_qs(parsed.query)
                 video_id = qs.get("v", [""])[0]
-            if video_id in id_list:
+            if video_id in id_dict:
                 print(f"動画ID {video_id} は既に存在するためスキップします。")
                 continue
             title_elem = video.find_element(By.CSS_SELECTOR, "#video-title")

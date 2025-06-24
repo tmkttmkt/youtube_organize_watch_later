@@ -28,14 +28,14 @@ def show_database_page(df):
 
     if group_by == "なし":
         group_summary(sorted_df)
-        st.dataframe(sorted_df.drop(columns=["time_group", "length_sec"]), use_container_width=True)
+        st.dataframe(sorted_df.drop(columns=["time_group", "length_sec", "url","video_id"]), use_container_width=True)
     elif group_by == "channel":
         channel_counts = sorted_df["channel"].value_counts()
         for channel in channel_counts.index:
             group = sorted_df[sorted_df["channel"] == channel]
             st.markdown(f"## 📺 {channel}")
             group_summary(group)
-            st.dataframe(group.drop(columns=["time_group", "length_sec"]), use_container_width=True)
+            st.dataframe(group.drop(columns=["time_group", "length_sec", "url"]), use_container_width=True)
     elif group_by == "tag":
         exploded = sorted_df.explode("tag")
         tag_counts = exploded["tag"].value_counts()
@@ -45,4 +45,4 @@ def show_database_page(df):
             group = exploded[exploded["tag"] == tag]
             st.markdown(f"## 🏷️ {tag}")
             group_summary(group)
-            st.dataframe(group.drop(columns=["time_group", "length_sec"]), use_container_width=True)
+            st.dataframe(group.drop(columns=["time_group", "length_sec", "url"]), use_container_width=True)

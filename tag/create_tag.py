@@ -4,7 +4,7 @@ from collections import Counter
 import unicodedata
 import random
 
-with open("watch_later.json", encoding="utf-8") as f:
+with open("data/watch_later.json", encoding="utf-8") as f:
     data = json.load(f)
 
 mecab = MeCab.Tagger("-Ochasen")
@@ -64,14 +64,12 @@ for item in data:
                 print(f"channel: {surface} / {feature}")
         node = node.next
 
-# 出現回数で降順ソート
-title_words_sorted = dict(sorted(title_words.items(), key=lambda x: x[1], reverse=True))
-channel_words_sorted = dict(sorted(channel_words.items(), key=lambda x: x[1], reverse=True))
 
-result = {
-    "title_words": title_words_sorted,
-    "channel_words": channel_words_sorted
-}
 
-with open("word_list.json", "w", encoding="utf-8") as f:
-    json.dump(result, f, ensure_ascii=False, indent=2)
+title_words_sorted = dict(sorted([(k, v) for k, v in title_words.items() if v >= 1], key=lambda x: x[1], reverse=True))
+channel_words_sorted = dict(sorted([(k, v) for k, v in channel_words.items() if v >= 1], key=lambda x: x[1], reverse=True))
+
+with open("title_word_list.json", "w", encoding="utf-8") as f:
+    json.dump(title_words_sorted, f, ensure_ascii=False, indent=2)
+with open("channel_word_list.json", "w", encoding="utf-8") as f:
+    json.dump(channel_words_sorted, f, ensure_ascii=False, indent=2)
