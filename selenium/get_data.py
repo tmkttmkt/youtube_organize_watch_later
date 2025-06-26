@@ -86,7 +86,7 @@ try:
     videos = driver.find_elements(By.XPATH, "//ytd-playlist-video-renderer")
     for video in videos:
         try:
-            a_elem = video.find_element(By.CSS_SELECTOR, "a#video-title")
+            a_elem = video.find_element(By.CSS_SELECTOR, "a#thumbnail")
             href = a_elem.get_attribute("href")
             video_id = ""
             if href:
