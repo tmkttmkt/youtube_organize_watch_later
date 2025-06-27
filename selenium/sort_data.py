@@ -10,24 +10,12 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
-# コマンドライン引数から切り出し方法を取得
-cutout_method = "old_videos"  # デフォルト値
-input_value = ""
-
+# コマンドライン引数からソート方法を取得
+sort_method = "date_asc"  # デフォルト値
 if len(sys.argv) > 1:
-    cutout_method = sys.argv[1]
+    sort_method = sys.argv[1]
 
-if len(sys.argv) > 2:
-    input_value = sys.argv[2]
-
-print(f"切り出し方法: {cutout_method}")
-if input_value:
-    if cutout_method == "specific_channel":
-        print(f"対象チャンネル: {input_value}")
-    elif cutout_method == "specific_tag":
-        print(f"対象タグ: {input_value}")
-    else:
-        print(f"追加パラメータ: {input_value}")
+print(f"ソート方法: {sort_method}")
 
 # オプションの設定
 options = uc.ChromeOptions()

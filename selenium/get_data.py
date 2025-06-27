@@ -10,8 +10,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
 
-with open("data/watch_later.json", "r", encoding="utf-8") as f:
-    video_data = json.load(f)
+video_data = []
+if os.path.exists("data/watch_later.json"):
+    with open("data/watch_later.json", "r", encoding="utf-8") as f:
+        video_data = json.load(f)
+else:
+    # ファイルがなければ空リストで初期化
+    video_data = []
 id_dict = {video["video_id"]: video["insert"] for video in video_data}
 id_dict[""]=""
 # オプションの設定
@@ -29,7 +34,6 @@ driver = uc.Chrome(options=options)
 
 print("Chrome browser started with specified profile.")
 time.sleep(2)  # 2秒待機
-
 try:
     # YouTubeを開く
     driver.get("https://www.youtube.com")

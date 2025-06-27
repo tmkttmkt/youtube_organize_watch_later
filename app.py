@@ -88,4 +88,4 @@ elif page == "日別スコア集計":
 elif page == "検索":
     show_search_page(df)
 elif page == "操作ページ":
-    show_admin_page()
+    show_admin_page(df)
