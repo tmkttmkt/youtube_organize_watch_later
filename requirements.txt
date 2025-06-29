@@ -3,3 +3,4 @@ selenium
 setuptools
 streamlit
 matplotlib
+pyinstaller 

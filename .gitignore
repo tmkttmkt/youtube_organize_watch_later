@@ -5,3 +5,5 @@ time/
 __pycache__/
 log.txt
 deleted_videos.txt
+build/
+*.spec
