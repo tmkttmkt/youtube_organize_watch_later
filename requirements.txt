@@ -3,3 +3,7 @@ selenium
 setuptools
 streamlit
 matplotlib
+google-api-python-client
+isodate
+pandas
+numpy
