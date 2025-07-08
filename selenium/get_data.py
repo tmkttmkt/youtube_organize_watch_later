@@ -11,6 +11,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 video_data = []
+# dataフォルダがなければ作成
+if not os.path.exists("data"):
+    os.makedirs("data")
 if os.path.exists("data/watch_later.json"):
     with open("data/watch_later.json", "r", encoding="utf-8") as f:
         video_data = json.load(f)
@@ -23,15 +26,18 @@ id_dict[""]=""
 options = uc.ChromeOptions()
 #options.add_argument('--headless=new')  # ヘッドレスモードで起動（Chrome 109以降は--headless=new推奨）
 # 必要に応じてプロファイルやその他のオプションを追加
-user_data_dir = os.path.expandvars(r"C:\User Data")
-profile_dir = "Profile 1"
+user_data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "User Data"))
+profile_dir = "Profile 1"  # デフォルトプロファイルを使用する場合はコメントアウト
 options.add_argument(f"--user-data-dir={user_data_dir}")
 options.add_argument(f"--profile-directory={profile_dir}")
 
 
+
+
 # undetected_chromedriverでブラウザを起動
 driver = uc.Chrome(options=options)
-
+#最初はコメント文外して
+#input("ストップする")
 print("Chrome browser started with specified profile.")
 time.sleep(2)  # 2秒待機
 try:
@@ -43,8 +49,7 @@ try:
         login_button = driver.find_element(By.XPATH, "//yt-formatted-string[text()='ログイン']")
         login_button.click()
         time.sleep(2)  # 2秒待機
-        # アカウント名を変数化
-        account_name_text = "レーニンの演説聞く人は零人"  # ここにクリックしたいアカウント名を入力
+        account_name_text = ""  # ここにクリックしたいアカウント名を入力
         # アカウント選択画面でアカウント名をクリック
         account_name = driver.find_element(By.XPATH, f"//div[@data-identifier and .='{account_name_text}']")
         account_name.click()

@@ -20,7 +20,7 @@ print(f"ソート方法: {sort_method}")
 # オプションの設定
 options = uc.ChromeOptions()
 # 必要に応じてプロファイルやその他のオプションを追加
-user_data_dir = os.path.expandvars(r"C:\User Data")
+user_data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "User Data"))
 profile_dir = "Profile 1"
 options.add_argument(f"--user-data-dir={user_data_dir}")
 options.add_argument(f"--profile-directory={profile_dir}")

@@ -5,4 +5,9 @@ time/
 __pycache__/
 log.txt
 deleted_videos.txt
+<<<<<<< HEAD
 *.csv
+=======
+build/
+*.spec
+>>>>>>> 593c0c91ffca90f082ce432e40fbd0004913b224
