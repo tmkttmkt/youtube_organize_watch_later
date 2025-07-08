@@ -3,11 +3,8 @@ selenium
 setuptools
 streamlit
 matplotlib
-<<<<<<< HEAD
 google-api-python-client
 isodate
 pandas
 numpy
-=======
 pyinstaller 
->>>>>>> 593c0c91ffca90f082ce432e40fbd0004913b224
