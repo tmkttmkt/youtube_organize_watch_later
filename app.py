@@ -70,6 +70,8 @@ def load_score_csvs():
     return df
 
 df = pd.DataFrame(data)
+if df.empty or df.columns.empty:
+    st.error("データがありません。'data/tag_data.json'の内容を確認してください。")
 df["tag_str"] = df["tag"].apply(lambda tags: ", ".join(tags) if tags else "なし")
 df["length_sec"] = df["length"].apply(length_to_seconds)
 
