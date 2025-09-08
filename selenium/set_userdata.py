@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
 import undetected_chromedriver as uc
 import json
 import sys
@@ -57,6 +58,18 @@ options.add_argument(f"--profile-directory={profile_dir}")
 driver = uc.Chrome(options=options)
 
 print("Chrome browser started with specified profile.")
-time.sleep(2)  # 2秒待機
-print("ブラウザが閉じられるまで待機します...")
-driver.wait_for_browser_exit()
+
+try:
+    driver.get("https://www.youtube.com")
+
+    while True:
+        try:
+            # 定期的にブラウザにアクセスしてみる
+            _ = driver.title
+        except WebDriverException:
+            print("ブラウザが閉じられました。スクリプトを終了します。")
+            break
+        time.sleep(1)  # 1秒ごとに監視
+
+finally:
+    driver.quit()

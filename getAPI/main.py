@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime
 import re
 from sentence_transformers import SentenceTransformer
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def load_details_data():
     """details_data.jsonを読み込む"""
@@ -181,52 +181,39 @@ def preprocess_data(data):
     
     # 新しいカラムを追加
     print("新しいカラムを追加中...")
-
+    
     # 動画時間を分:秒形式で追加
     df['duration_formatted'] = df['duration_sec'].apply(preprocess_duration)
-
+    
     # 公開日時を日本時間で追加
     df['published_at_jst'] = df['publishedAt'].apply(preprocess_published_date)
-
+    
     # 説明文のクリーンアップ
     df['description_clean'] = df['description'].apply(clean_description)
-
+    
     # タグ数を追加
     df['tag_count'] = df['tags'].apply(lambda x: len(x) if isinstance(x, list) else 0)
-
+    
     # エンゲージメント率（いいね数/視聴回数）
     df['engagement_rate'] = np.where(
         df['viewCount'] > 0, 
         df['likeCount'] / df['viewCount'] * 100, 
         0
     )
-
+    
     # 視聴回数のlog変換
     df['viewCount_log'] = np.where(
         df['viewCount'] > 1,  # 1より大きい場合のみlog変換
         np.log10(df['viewCount']),
         0
     )
-
+    
     # 動画時間のlog変換
     df['duration_log'] = np.where(
         df['duration_sec'] > 1,  # 1より大きい場合のみlog変換
         np.log10(df['duration_sec']),
         0
     )
-
-    # タイトルと説明文のSentenceTransformer埋め込み特徴量を追加
-    print("タイトルと説明文をSentenceTransformerでベクトル化中...")
-    title_embeddings = model.encode(df['title'].fillna('').tolist(), show_progress_bar=True)
-    desc_embeddings = model.encode(df['description'].fillna('').tolist(), show_progress_bar=True)
-
-    # 各次元ごとにカラムを追加
-    for i in range(title_embeddings.shape[1]):
-        df[f'title_emb_{i}'] = title_embeddings[:, i]
-    for i in range(desc_embeddings.shape[1]):
-        df[f'desc_emb_{i}'] = desc_embeddings[:, i]
-    print(f"タイトル特徴量: title_emb_0 ~ title_emb_{title_embeddings.shape[1]-1}")
-    print(f"説明文特徴量: desc_emb_0 ~ desc_emb_{desc_embeddings.shape[1]-1}")
     
     # フラグ系の特徴量を追加
     print("フラグ系特徴量を追加中...")
@@ -253,17 +240,10 @@ def preprocess_data(data):
     # カテゴリIDを数値として使用
     df['category_id'] = pd.to_numeric(df['categoryId'].fillna(0), errors='coerce').fillna(0).astype(int)
     
-
     # カテゴリIDのワンホットエンコーディング
     print("カテゴリIDをワンホットエンコーディング中...")
     category_dummies = pd.get_dummies(df['category_id'], prefix='category')
     df = pd.concat([df, category_dummies], axis=1)
-
-    # チャンネル名のSentenceTransformer埋め込み特徴量を追加
-    print("チャンネル名をSentenceTransformerでベクトル化中...")
-    channel_embeddings = model.encode(df['channelTitle'].fillna('').tolist(), show_progress_bar=True)
-    for i in range(channel_embeddings.shape[1]):
-        df[f'channel_emb_{i}'] = channel_embeddings[:, i]
     
     # 公開日時から時間特徴量を抽出してDataFrameに展開
     print("公開日時から時間特徴量を抽出中...")
@@ -290,28 +270,18 @@ def preprocess_data(data):
         'pub_day_of_year', 'pub_week_of_year', 'pub_quarter', 'pub_is_weekend',
         'pub_is_holiday_season', 'pub_time_of_day', 'pub_days_since_epoch'
     ]
-
-    # タイトル・説明文の埋め込み特徴量カラムを自動で追加
-    title_emb_cols = [col for col in df.columns if col.startswith('title_emb_')]
-    desc_emb_cols = [col for col in df.columns if col.startswith('desc_emb_')]
-    ml_columns_order.extend(title_emb_cols)
-    ml_columns_order.extend(desc_emb_cols)
-
-
+    
     # カテゴリのワンホットエンコーディングカラムを追加
     category_columns = [col for col in df.columns if col.startswith('category_')]
     ml_columns_order.extend(category_columns)
-    # チャンネル名の埋め込み特徴量カラムを追加
-    channel_emb_cols = [col for col in df.columns if col.startswith('channel_emb_')]
-    ml_columns_order.extend(channel_emb_cols)
-
+    
     # 存在するカラムのみを選択
     available_columns = [col for col in ml_columns_order if col in df.columns]
     df_processed = df[available_columns].copy()
-
+    
     print(f"\n処理後件数: {len(df_processed)}件")
     print(f"カラム数: {len(df_processed.columns)}個")
-
+    
     return df_processed
 
 def save_processed_data(df):
@@ -325,60 +295,31 @@ def save_processed_data(df):
                       'pub_year', 'pub_month', 'pub_day', 'pub_hour', 'pub_day_of_week',
                       'pub_day_of_year', 'pub_week_of_year', 'pub_quarter', 'pub_is_weekend',
                       'pub_is_holiday_season', 'pub_time_of_day', 'pub_days_since_epoch']
-
-        # タイトル・説明文の埋め込み特徴量カラムを自動で追加
-        title_emb_cols = [col for col in df.columns if col.startswith('title_emb_')]
-        desc_emb_cols = [col for col in df.columns if col.startswith('desc_emb_')]
-        ml_features.extend(title_emb_cols)
-        ml_features.extend(desc_emb_cols)
-
-
+        
         # カテゴリのワンホットエンコーディングカラムを追加
         category_columns = [col for col in df.columns if col.startswith('category_')]
         ml_features.extend(category_columns)
-        # チャンネル名の埋め込み特徴量カラムを追加
-        channel_emb_cols = [col for col in df.columns if col.startswith('channel_emb_')]
-        ml_features.extend(channel_emb_cols)
-
+        
         # 存在するカラムのみを選択
         available_ml_features = [col for col in ml_features if col in df.columns]
         df_ml = df[available_ml_features].copy()
-
-        # 既存CSVがあれば読み込み、video_idで重複排除して上書き
+        
+        # 機械学習用CSVを保存
         csv_path = "data/ml_features.csv"
-        import os
-        if os.path.exists(csv_path):
-            df_old = pd.read_csv(csv_path, encoding="utf-8")
-            # video_idが重複する場合は新しいdf_mlで上書き
-            df_combined = pd.concat([df_old, df_ml], ignore_index=True)
-            df_combined = df_combined.drop_duplicates(subset=['video_id'], keep='last')
-            # カラム順を揃える
-            df_combined = df_combined[available_ml_features]
-            df_ml = df_combined.reset_index(drop=True)
-        # 保存
         df_ml.to_csv(csv_path, index=False, encoding="utf-8")
         print(f"機械学習用CSVファイルを保存: {csv_path} ({len(available_ml_features)}カラム)")
-
-
+        
         # 機械学習用特徴量の詳細情報をJSONで保存
         category_columns = [col for col in df_ml.columns if col.startswith('category_')]
-        # チャンネル名の埋め込み特徴量カラム
-        channel_emb_cols = [col for col in df_ml.columns if col.startswith('channel_emb_')]
-        numeric_features = [col for col in available_ml_features if col not in ['video_id', 'pub_time_of_day'] and not col.startswith('category_') and not col.startswith('channel_emb_') and not col in ['pub_time_of_day']]
-        # title_emb_・desc_emb_・channel_emb_もnumeric_featuresに含める
-        numeric_features += [col for col in available_ml_features if col.startswith('title_emb_') or col.startswith('desc_emb_') or col.startswith('channel_emb_')]
-        # 重複除去
-        numeric_features = list(dict.fromkeys(numeric_features))
         feature_info = {
-            'numeric_features': numeric_features,
+            'numeric_features': [col for col in available_ml_features if col not in ['video_id', 'pub_time_of_day'] and not col.startswith('category_')],
             'categorical_features': ['pub_time_of_day'] if 'pub_time_of_day' in available_ml_features else [],
             'category_onehot_features': category_columns,
-            'channel_emb_features': channel_emb_cols,
             'feature_count': len(available_ml_features),
             'record_count': len(df_ml),
-            'description': '機械学習用に前処理済みのYouTube動画特徴量データセット（カテゴリIDワンホットエンコーディング・チャンネル名埋め込み・タイトル・説明文埋め込み含む）'
+            'description': '機械学習用に前処理済みのYouTube動画特徴量データセット（カテゴリIDワンホットエンコーディング済み）'
         }
-
+        
         feature_info_path = "data/ml_feature_info.json"
         with open(feature_info_path, 'w', encoding='utf-8') as f:
             json.dump(feature_info, f, ensure_ascii=False, indent=2)

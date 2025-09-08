@@ -12,7 +12,9 @@ from component.pie_chart_page import show_pie_chart_page
 from component.bar_chart_page import show_bar_chart_page
 from component.score_page import show_score_page
 from component.admin_page import show_admin_page
+
 from component.search_page import show_search_page
+from component.classify_page import show_classify_page
 
 
 
@@ -72,7 +74,7 @@ df["tag_str"] = df["tag"].apply(lambda tags: ", ".join(tags) if tags else "な�
 df["length_sec"] = df["length"].apply(length_to_seconds)
 
 # サイドバーでページ選択
-page = st.sidebar.selectbox("ページを選択", ["日別スコア集計", "一覧", "データベース", "グラフ（円）", "グラフ（棒）", "検索", "操作ページ"])
+page = st.sidebar.selectbox("ページを選択", ["日別スコア集計", "一覧", "データベース", "グラフ（円）", "グラフ（棒）", "検索", "操作ページ", "動画分類"])
 st.sidebar.title("メニュー")
 
 if page == "一覧":
@@ -89,3 +91,5 @@ elif page == "検索":
     show_search_page(df)
 elif page == "操作ページ":
     show_admin_page(df)
+elif page == "動画分類":
+    show_classify_page()

@@ -10,18 +10,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
 
-video_data = []
+past_video_data = []
 # dataフォルダがなければ作成
 if not os.path.exists("data"):
     os.makedirs("data")
 if os.path.exists("data/watch_later.json"):
     with open("data/watch_later.json", "r", encoding="utf-8") as f:
-        video_data = json.load(f)
+        past_video_data = json.load(f)
 else:
     # ファイルがなければ空リストで初期化
-    video_data = []
-id_dict = {video["video_id"]: video["insert"] for video in video_data}
+    past_video_data = []
+id_dict = {video["video_id"]: video["insert"] for video in past_video_data}
 id_dict[""]=""
+video_data = []
 # オプションの設定
 options = uc.ChromeOptions()
 #options.add_argument('--headless=new')  # ヘッドレスモードで起動（Chrome 109以降は--headless=new推奨）
@@ -106,6 +107,10 @@ try:
                 video_id = qs.get("v", [""])[0]
             if video_id in id_dict:
                 print(f"動画ID {video_id} は既に存在するためスキップします。")
+                # video_idが一致するpast_video_dataの要素を探して追加
+                matched_video = next((video for video in past_video_data if video.get("video_id") == video_id), None)
+                if matched_video:
+                    video_data.append(matched_video)
                 continue
             title_elem = video.find_element(By.CSS_SELECTOR, "#video-title")
             channel_elem = video.find_element(By.CSS_SELECTOR, "a.yt-simple-endpoint.style-scope.yt-formatted-string")
@@ -133,7 +138,7 @@ try:
             })
         except Exception as e:
             print(f"動画情報の取得に失敗: {e}")
-
+    pass
     # JSONファイルに書き込む
     with open("data/watch_later.json", "w", encoding="utf-8") as f:
         json.dump(video_data, f, ensure_ascii=False, indent=2)

@@ -8,3 +8,9 @@ isodate
 pandas
 numpy
 pyinstaller 
+isodate
+# ai系
+scikit-learn
+sentence-transformers
+# 
+python-dotenv

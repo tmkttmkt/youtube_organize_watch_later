@@ -1,4 +1,5 @@
 venv/
+.venv/
 User Data/
 time/
 *.json
@@ -8,3 +9,4 @@ deleted_videos.txt
 *.csv
 build/
 *.spec
+.env

@@ -1,8 +1,13 @@
 from googleapiclient.discovery import build
 import isodate  # ISO 8601 duration変換に必要
 import datetime
+import os
+from dotenv import load_dotenv
 
-API_KEY = "AIzaSyDo7Ec6uv-jYpcx59h6HbKzzBwEOWgxHHY"
+load_dotenv()
+API_KEY = os.getenv('YOUTUBE_API_KEY')
+if not API_KEY:
+    raise ValueError(".envファイルにYOUTUBE_API_KEYが設定されていません")
 youtube = build("youtube", "v3", developerKey=API_KEY)
 
 def get_video_details(video_id):
