@@ -41,7 +41,7 @@ try:
     login_button.click()
     time.sleep(2)  # 2秒待機
     # アカウント名を変数化
-    account_name_text = "レーニンの演説聞く人は零人"  # ここにクリックしたいアカウント名を入力
+    account_name_text = ""  # ここにクリックしたいアカウント名を入力
     # アカウント選択画面でアカウント名をクリック
     account_name = driver.find_element(By.XPATH, f"//div[@data-identifier and .='{account_name_text}']")
     account_name.click()
