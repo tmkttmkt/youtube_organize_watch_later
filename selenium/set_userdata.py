@@ -37,14 +37,6 @@ current_dir = get_exe_dir()
 
 destination_dir = os.path.join(current_dir, 'User Data')
 
-# コピー実行
-try:
-    shutil.copytree(source_dir, destination_dir)
-    print(f"コピー完了: {destination_dir}")
-except FileExistsError:
-    print(f"コピー先に既に 'User Data' フォルダがあります: {destination_dir}")
-except Exception as e:
-    print(f"エラー発生: {e}")
 
 options = uc.ChromeOptions()
 # 必要に応じてプロファイルやその他のオプションを追加
