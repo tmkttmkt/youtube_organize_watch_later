@@ -64,7 +64,16 @@ try:
         watch_later_button.click()
         print("「後で見る」をクリックしました。")
     except Exception as e:
-        print("「後で見る」ボタンが見つかりませんでした。")
+        print("「後で見る」ボタンが見つかりませんでした。ガイドボタンを押して再試行します。")
+        try:
+            guide_button = driver.find_element(By.CSS_SELECTOR, "button[aria-label='ガイド']")
+            guide_button.click()
+            time.sleep(1)
+            watch_later_button = driver.find_element(By.XPATH, "//yt-formatted-string[text()='後で見る']")
+            watch_later_button.click()
+            print("「後で見る」をクリックしました。（ガイド経由）")
+        except Exception as e2:
+            print("ガイドボタンまたは「後で見る」ボタンが見つかりませんでした。")
 
     time.sleep(2)  # 2秒待機
 

@@ -17,12 +17,34 @@ def load_watch_later_json():
         return []
 
 def save_details_json(details_list):
-    """詳細情報をJSONファイルに保存"""
+    """詳細情報をJSONファイルに保存（重複video_idを避けて結合）"""
     output_path = "data/details_data.json"
+    # 既存データを読み込む
+    if os.path.exists(output_path):
+        try:
+            with open(output_path, "r", encoding="utf-8") as f:
+                existing_data = json.load(f)
+        except Exception as e:
+            print(f"既存ファイル読み込みエラー: {e}")
+            existing_data = []
+    else:
+        existing_data = []
+
+    # video_idで重複を避けて結合し、新規データで上書き
+    merged_dict = {item["video_id"]: item for item in existing_data if "video_id" in item}
+    for item in details_list:
+        vid = item.get("video_id")
+        if vid:
+            merged_dict[vid] = item  # 新規データで上書き
+    merged_data = list(merged_dict.values())
+    # 新規追加分の件数を計算
+    existing_ids = {item["video_id"] for item in existing_data if "video_id" in item}
+    new_items = [item for item in details_list if item.get("video_id") not in existing_ids]
+
     try:
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(details_list, f, ensure_ascii=False, indent=2)
-        print(f"詳細情報を {output_path} に保存しました")
+            json.dump(merged_data, f, ensure_ascii=False, indent=2)
+        print(f"詳細情報を {output_path} に保存しました（{len(new_items)}件追加）")
     except Exception as e:
         print(f"ファイル保存エラー: {e}")
 
